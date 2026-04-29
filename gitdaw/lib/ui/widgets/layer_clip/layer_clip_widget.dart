@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../models/commit_model.dart';
@@ -55,17 +56,24 @@ class _LayerClipWidgetState extends ConsumerState<LayerClipWidget> {
   }
 
   Widget _buildWithBlur(bool isHovered) {
+    // BackdropFilter causes full-screen gray rendering on Flutter Web (CanvasKit).
+    // Skip it on web — LayerClipPainter already provides the glass effect.
     return ClipRRect(
       borderRadius: BorderRadius.circular(AppConstants.clipRadius),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-        child: _buildContent(isHovered),
-      ),
+      child: kIsWeb
+          ? _buildContent(isHovered)
+          : BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+              child: _buildContent(isHovered),
+            ),
     );
   }
 
   Widget _buildWithoutBlur(bool isHovered) {
-    return _buildContent(isHovered);
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(AppConstants.clipRadius),
+      child: _buildContent(isHovered),
+    );
   }
 
   Widget _buildContent(bool isHovered) {

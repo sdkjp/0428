@@ -64,7 +64,9 @@ class _TimelineCanvasState extends ConsumerState<TimelineCanvas> {
                     ? 32
                     : AppConstants.trackHeight));
 
-        return Column(
+        return ColoredBox(
+          color: const Color(0xFF0E0E14),
+          child: Column(
           children: [
             // Ruler + track headers row
             Row(
@@ -202,6 +204,7 @@ class _TimelineCanvasState extends ConsumerState<TimelineCanvas> {
               ),
             ),
           ],
+          ),
         );
       },
     );
