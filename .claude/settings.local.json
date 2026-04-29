@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter create *)",
+      "Read(//usr/local/bin/**)",
+      "Read(//Users/__s__d__k__/flutter/bin/**)",
+      "Read(//opt/homebrew/bin/**)",
+      "Read(//Users/__s__d__k__/**)",
+      "Bash(brew info *)",
+      "Bash(export PATH=\"/opt/homebrew/bin:$PATH\")",
+      "Bash(dart --version)",
+      "Bash(flutter pub *)",
+      "Bash(flutter analyze *)",
+      "Bash(flutter build *)",
+      "Bash(xcode-select --print-path)",
+      "Bash(xcrun --find xcodebuild)",
+      "Bash(xcodebuild -version)",
+      "mcp__Claude_Preview__preview_start"
+    ]
+  }
+}
