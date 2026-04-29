@@ -46,8 +46,8 @@ class CommitsNotifier
   Future<Map<String, List<CommitModel>>> build() async {
     final git = ref.watch(gitServiceProvider);
     if (git == null) return {};
-    // Re-run whenever the repo path changes
-    ref.watch(repositoryProvider);
+    // gitServiceProvider already depends on repositoryProvider,
+    // so a path change triggers a rebuild here automatically.
     return _fetchAll(git);
   }
 
