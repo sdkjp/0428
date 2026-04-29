@@ -1,0 +1,50 @@
+name: Deploy GitDAW to GitHub Pages
+
+on:
+  push:
+    branches:
+      - feature/pwa
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.8'
+          channel: stable
+          cache: true
+
+      - name: Get dependencies
+        working-directory: gitdaw
+        run: flutter pub get
+
+      - name: Build web
+        working-directory: gitdaw
+        run: flutter build web --no-tree-shake-icons --base-href "/0428/"
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: gitdaw/build/web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment
