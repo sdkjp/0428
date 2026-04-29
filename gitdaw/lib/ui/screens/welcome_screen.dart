@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:file_picker/file_picker.dart';
-import 'dart:io';
 import '../../providers/repository_provider.dart';
+import '../../services/folder_picker.dart';
+import '../../services/git_service.dart';
 import '../widgets/shared/glass_container.dart';
 
 class WelcomeScreen extends ConsumerWidget {
@@ -96,38 +96,42 @@ class WelcomeScreen extends ConsumerWidget {
   }
 
   Future<void> _pickFolder(BuildContext context, WidgetRef ref) async {
-    final result = await FilePicker.getDirectoryPath(
-      dialogTitle: 'フォルダを選択してください',
-    );
+    final result = await pickFolderPath();
     if (result == null) return;
 
+    // Set path so providers can react
     ref.read(selectedRepoPathProvider.notifier).setPath(result);
 
-    // Check if it's a git repo; if not, offer to initialize
-    final isGit = await Process.run('git', ['rev-parse', '--git-dir'],
-            workingDirectory: result)
-        .then((r) => r.exitCode == 0);
+    // Check git status directly — don't call Notifier.build() externally
+    final git = GitService(repoPath: result);
+    final isGit = await git.isGitRepo(result);
 
     if (!isGit && context.mounted) {
       final shouldInit = await showDialog<bool>(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: const Text('Gitが見つかりません'),
+          backgroundColor: const Color(0xFF1A1A28),
+          title: const Text('Gitが見つかりません',
+              style: TextStyle(color: Colors.white)),
           content: const Text(
-              'このフォルダはまだGitで管理されていません。\n今すぐ初期化しますか？'),
+            'このフォルダはまだGitで管理されていません。\n今すぐ初期化しますか？',
+            style: TextStyle(color: Color(0xFFB0B0C8)),
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(false),
               child: const Text('キャンセル'),
             ),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF6C8EFF)),
               onPressed: () => Navigator.of(ctx).pop(true),
               child: const Text('初期化する'),
             ),
           ],
         ),
       );
-      if (shouldInit == true) {
+      if (shouldInit == true && context.mounted) {
         await ref.read(repositoryProvider.notifier).initializeRepo();
       }
     }
@@ -179,7 +183,6 @@ class _GlassFolderHero extends StatelessWidget {
     return Stack(
       alignment: Alignment.center,
       children: [
-        // Glow
         Container(
           width: 160,
           height: 160,
@@ -193,7 +196,6 @@ class _GlassFolderHero extends StatelessWidget {
             ),
           ),
         ),
-        // Glass panel stack (3D illusion)
         Transform.translate(
           offset: const Offset(8, 8),
           child: _glassFolderTile(const Color(0xFF3A3A60), 0.3),

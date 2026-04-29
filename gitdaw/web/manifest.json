@@ -1,12 +1,15 @@
 {
-    "name": "gitdaw",
-    "short_name": "gitdaw",
-    "start_url": ".",
+    "name": "GitDAW",
+    "short_name": "GitDAW",
+    "description": "ファイルの変更を音楽のように管理する",
+    "start_url": "/",
+    "id": "/",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
-    "orientation": "portrait-primary",
+    "display_override": ["window-controls-overlay", "standalone"],
+    "background_color": "#0E0E14",
+    "theme_color": "#141420",
+    "orientation": "any",
+    "categories": ["productivity", "utilities"],
     "prefer_related_applications": false,
     "icons": [
         {
